@@ -6,7 +6,7 @@ namespace Axleus\UserManager;
 
 use Axleus\Mailer\ConfigProvider as MailConfigProvider;
 use Axleus\Mailer\Adapter\AdapterInterface;
-use axleus\Mailer\Middleware\MailerMiddleware;
+use Axleus\Mailer\Middleware\MailerMiddleware;
 use Axleus\Validator\PasswordRequirement;
 use Fig\Http\Message\RequestMethodInterface as Http;
 use Laminas\ServiceManager\Factory\InvokableFactory;
