@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Axleus\UserManager\Handler;
 
-use Axleus\Core\HandlerTrait;
+use Axleus\Core\Handler\HandlerTrait;
 use Axleus\UserManager\Form\ResetPassword;
 use Axleus\UserManager\Helper\VerificationHelper;
 use Axleus\Htmx\HtmxHandlerTrait;
