@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Axleus\UserManager\Handler;
 
-use Axleus\Core\HandlerTrait;
+use Axleus\Core\Handler\HandlerTrait;
 use Axleus\UserManager\Message\VerificationEmail;
 use Axleus\UserManager\Form\Register;
 use Axleus\UserManager\User\UserRepository;
