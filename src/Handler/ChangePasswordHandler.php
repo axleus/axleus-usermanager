@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Axleus\UserManager\Handler;
 
-use Axleus\Core\HandlerTrait;
+use Axleus\Core\Handler\HandlerTrait;
 use Axleus\Message\SystemMessage;
 use Axleus\UserManager\ConfigProvider;
 use Axleus\UserManager\Form\ChangePassword;
@@ -18,8 +18,6 @@ use Psr\Http\Server\RequestHandlerInterface;
 use Laminas\Diactoros\Response\HtmlResponse;
 use Laminas\Diactoros\Response\RedirectResponse;
 use Laminas\EventManager\EventManagerInterface;
-use Laminas\View\Model\ModelInterface;
-use Laminas\View\Model\ViewModel;
 use Mezzio\Authentication\UserInterface;
 use Mezzio\Helper\UrlHelper;
 use Mezzio\Template\TemplateRendererInterface;
@@ -78,21 +76,14 @@ class ChangePasswordHandler implements RequestHandlerInterface
             $this->form->setData(['acct-data' => ['id' => $userInterface->getDetail('id'), 'isTokenReset' => 0]]);
         }
 
-        /** @var ViewModel */
-        $model = $request->getAttribute(ModelInterface::class);
-        $model->setVariable('form', $this->form);
-
         return new HtmlResponse($this->renderer->render(
             'user-manager::change-password',
-            $model
+            ['form' => $this->form]
         ));
     }
 
     public function handlePost(ServerRequestInterface $request): ResponseInterface
     {
-        /** @var ViewModel */
-        $model = $request->getAttribute(ModelInterface::class);
-        $model->setVariable('form', $this->form);
         $body = $request->getParsedBody();
         /** @var ChangePasswordFieldset */
         $fieldset = $this->form->get('acct-data');
@@ -122,7 +113,7 @@ class ChangePasswordHandler implements RequestHandlerInterface
 
         return new HtmlResponse($this->renderer->render(
             'user-manager::change-password',
-            $model
+            ['form' => $this->form]
         ));
     }
 }

@@ -10,7 +10,6 @@ use Laminas\Diactoros\Response\EmptyResponse;
 use Laminas\Diactoros\Response\HtmlResponse;
 use Laminas\Diactoros\Response\RedirectResponse;
 use Laminas\Diactoros\Uri;
-use Laminas\View\Model\ModelInterface;
 use Mezzio\Authentication\Session\PhpSession;
 use Mezzio\Authentication\UserInterface;
 use Mezzio\Session\SessionInterface;
@@ -42,8 +41,8 @@ class LoginHandler implements RequestHandlerInterface
         $redirect = $this->getRedirect($request, $session);
         // handle supported Http Method types, proxy to the correct handler method
         return match($request->getMethod()) {
-            Http::METHOD_GET    => $this->handleGet($request),
-            Http::METHOD_POST   => $this->handlePost($request, $session, $redirect),
+            Http::METHOD_GET  => $this->handleGet($request),
+            Http::METHOD_POST => $this->handlePost($request, $session, $redirect),
             default => new EmptyResponse(405), // defaults to a method not allowed
         };
     }
@@ -59,13 +58,10 @@ class LoginHandler implements RequestHandlerInterface
         $this->form->setValidationGroup(['email', 'password']);
         $this->form->setData($request->getParsedBody());
 
-        $model = $request->getAttribute(ModelInterface::class);
-        $model->setVariable('form', $this->form);
-
         if (! $this->form->isValid()) {
             return new HtmlResponse($this->renderer->render(
                     'user-manager::login',
-                    $model
+                    ['form' => $this->form]
             ));
         }
 
@@ -77,12 +73,10 @@ class LoginHandler implements RequestHandlerInterface
 
     public function handleGet(ServerRequestInterface $request): ResponseInterface
     {
-        $model = $request->getAttribute(ModelInterface::class);
-        $model->setVariable('form', $this->form);
         return new HtmlResponse(
             $this->renderer->render(
                 'user-manager::login',
-                $model
+                ['form' => $this->form]
             )
         );
     }

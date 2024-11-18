@@ -6,7 +6,7 @@ namespace Axleus\UserManager;
 
 use Axleus\Mailer\ConfigProvider as MailConfigProvider;
 use Axleus\Mailer\Adapter\AdapterInterface;
-use axleus\Mailer\Middleware\MailerMiddleware;
+use Axleus\Mailer\Middleware\MailerMiddleware;
 use Axleus\Validator\PasswordRequirement;
 use Fig\Http\Message\RequestMethodInterface as Http;
 use Laminas\ServiceManager\Factory\InvokableFactory;
@@ -19,7 +19,6 @@ use Mezzio\Authorization\AuthorizationInterface;
 use Mezzio\Authorization\AuthorizationMiddleware;
 use Mezzio\Authorization\Rbac\LaminasRbacAssertionInterface;
 use Mezzio\Helper\BodyParams\BodyParamsMiddleware;
-
 
 final class ConfigProvider
 {

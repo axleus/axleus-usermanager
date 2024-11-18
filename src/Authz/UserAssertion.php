@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace UserManager\Authz;
+namespace Axleus\UserManager\Authz;
 
 use Axleus\UserManager\UserRepository\UserEntity;
 use Laminas\Permissions\Rbac\Rbac;

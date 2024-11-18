@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Axleus\UserManager\Handler;
 
-use Axleus\Core\HandlerTrait;
+use Axleus\Core\Handler\HandlerTrait;
 use Axleus\Message\SystemMessage;
 use Axleus\UserManager\ConfigProvider;
 use Axleus\UserManager\Form\ResendVerification;
@@ -16,7 +16,6 @@ use Fig\Http\Message\RequestMethodInterface as Http;
 use Laminas\Diactoros\Response\HtmlResponse;
 use Laminas\Diactoros\Response\RedirectResponse;
 use Laminas\EventManager\EventManagerInterface;
-use Laminas\View\Model\ModelInterface;
 use Mezzio\Authentication\UserRepositoryInterface;
 use Mezzio\Helper\UrlHelper;
 use Mezzio\Template\TemplateRendererInterface;
@@ -41,8 +40,6 @@ class VerifyAccountHandler implements RequestHandlerInterface
     public function handleGet(ServerRequestInterface $request): ResponseInterface
     {
         try {
-            $model = $request->getAttribute(ModelInterface::class);
-            $model->setVariable('form', $this->form);
             if (
                 ! $this->verifyHelper->verifyToken(
                     $request,
@@ -65,7 +62,7 @@ class VerifyAccountHandler implements RequestHandlerInterface
                 ]);
                 return new HtmlResponse($this->renderer->render(
                     'user-manager::verify-account',
-                    $model
+                    ['form' => $this->form]
                 ));
             }
         } catch (\Throwable $th) {
