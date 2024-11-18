@@ -20,7 +20,6 @@ use Mezzio\Authorization\AuthorizationMiddleware;
 use Mezzio\Authorization\Rbac\LaminasRbacAssertionInterface;
 use Mezzio\Helper\BodyParams\BodyParamsMiddleware;
 
-
 final class ConfigProvider
 {
     public const MAIL_MESSAGE_TEMPLATES           = 'message_templates';

@@ -11,7 +11,6 @@ use Axleus\UserManager\User\UserRepository;
 use Laminas\Diactoros\Response\HtmlResponse;
 use Laminas\Diactoros\Response\RedirectResponse;
 use Laminas\EventManager\EventManagerInterface;
-use Laminas\View\Model\ModelInterface;
 use Mezzio\Authentication\UserRepositoryInterface;
 use Mezzio\Helper\UrlHelper;
 use Mezzio\Template\TemplateRendererInterface;
@@ -34,18 +33,14 @@ class RegistrationHandler implements RequestHandlerInterface
 
     public function handleGet(ServerRequestInterface $request): ResponseInterface
     {
-        $model = $request->getAttribute(ModelInterface::class);
-        $model->setVariable('form', $this->form);
         return new HtmlResponse($this->renderer->render(
             'user-manager::registration',
-            $model
+            ['form' => $this->form]
         ));
     }
 
     public function handlePost(ServerRequestInterface $request): ResponseInterface
     {
-        $model = $request->getAttribute(ModelInterface::class);
-        $model->setVariable('form', $this->form);
         $body = $request->getParsedBody();
         $this->form->setData($body);
         if ($this->form->isValid()) {
@@ -75,7 +70,7 @@ class RegistrationHandler implements RequestHandlerInterface
         }
         return new HtmlResponse($this->renderer->render(
             'user-manager::registration',
-            $model // parameters to pass to template
+            ['form' => $this->form]
         ));
     }
 }

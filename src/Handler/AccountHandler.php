@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace Axleus\UserManager\Handler;
 
-use Axleus\Htmx\RequestHeaders as HtmxHeader;
 use Laminas\Diactoros\Response\HtmlResponse;
-use Laminas\View\Model\ModelInterface;
 use Mezzio\Template\TemplateRendererInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -26,10 +24,9 @@ class AccountHandler implements RequestHandlerInterface
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $model = $request->getAttribute(ModelInterface::class);
         return new HtmlResponse($this->renderer->render(
             'user-manager::account',
-            $model
+            []
         ));
     }
 }

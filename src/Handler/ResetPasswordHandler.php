@@ -16,7 +16,6 @@ use Laminas\Diactoros\Response\RedirectResponse;
 use Laminas\EventManager\EventManagerInterface;
 use Laminas\Form\Exception\InvalidArgumentException;
 use Laminas\Form\Exception\DomainException;
-use Laminas\View\Model\ModelInterface;
 use Mezzio\Authentication\UserRepositoryInterface;
 use Mezzio\Flash\Exception\InvalidHopsValueException;
 use Mezzio\Helper\UrlHelper;
@@ -45,12 +44,10 @@ class ResetPasswordHandler implements RequestHandlerInterface
 
     public function handleGet(ServerRequestInterface $request): ResponseInterface
     {
-        $model = $request->getAttribute(ModelInterface::class);
-        $model->setVariable('form', $this->form);
         return new HtmlResponse(
             $this->renderer->render(
                 'user-manager::reset-password',
-                $model
+                ['form' => $this->form]
             )
         );
     }
@@ -93,11 +90,10 @@ class ResetPasswordHandler implements RequestHandlerInterface
             );
         }
 
-        $model = $request->getAttribute(ModelInterface::class);
         return new HtmlResponse(
             html: $this->renderer->render(
                 'user-manager::reset-password',
-                $model
+                ['form' => $this->form]
             )
         );
     }
