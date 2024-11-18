@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Axleus\UserManager\Handler;
 
+use Axleus\Core\Handler\HandlerTrait;
 use Laminas\Diactoros\Response\HtmlResponse;
 use Mezzio\Template\TemplateRendererInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -12,21 +13,22 @@ use Psr\Http\Server\RequestHandlerInterface;
 
 class AccountHandler implements RequestHandlerInterface
 {
-    /**
-     * @var TemplateRendererInterface
-     */
-    private $renderer;
+    use HandlerTrait;
 
-    public function __construct(TemplateRendererInterface $renderer)
-    {
-        $this->renderer = $renderer;
+    public function __construct(
+        private TemplateRendererInterface $renderer
+    ) {
     }
 
-    public function handle(ServerRequestInterface $request): ResponseInterface
+    public function handleGet(ServerRequestInterface $request): ResponseInterface
     {
+        $data = [
+            'title' => 'Account',
+        ];
+
         return new HtmlResponse($this->renderer->render(
             'user-manager::account',
-            []
+            $data
         ));
     }
 }

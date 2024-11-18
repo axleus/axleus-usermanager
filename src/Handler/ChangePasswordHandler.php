@@ -47,6 +47,8 @@ class ChangePasswordHandler implements RequestHandlerInterface
         $isValid       = false;
         $eventManager  = $request->getAttribute(EventManagerInterface::class);
         $systemMessage = new SystemMessage(SystemMessage::EVENT_SYSTEM_MESSAGE);
+        /** @var ChangePasswordFieldset */
+        $fieldset = $this->form->get('acct-data');
         if ($hasToken) {
             $isValid = $this->helper->verifyToken(
                 $request,
@@ -55,9 +57,6 @@ class ChangePasswordHandler implements RequestHandlerInterface
             );
         }
         if ($hasToken && $isValid) {
-
-            /** @var ChangePasswordFieldset */
-            $fieldset = $this->form->get('acct-data');
             $fieldset->remove('current_password');
             $this->form->setData(['acct-data' => ['id' => $params['id'], 'isTokenReset' => 1]]);
         } elseif($hasToken && ! $isValid) {
@@ -73,7 +72,9 @@ class ChangePasswordHandler implements RequestHandlerInterface
 
             /** @var UserInterface&UserEntity */
             $userInterface = $request->getAttribute(UserInterface::class);
-            $this->form->setData(['acct-data' => ['id' => $userInterface->getDetail('id'), 'isTokenReset' => 0]]);
+            $userId = $userInterface->getDetail('id');
+            $fieldset->setOption('userId', $userId);
+            $this->form->setData(['acct-data' => ['id' => $userId, 'isTokenReset' => 0]]);
         }
 
         return new HtmlResponse($this->renderer->render(
