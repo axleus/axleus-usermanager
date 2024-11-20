@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Axleus\UserManager\Middleware;
 
 use Laminas\Diactoros\Response\HtmlResponse;
-use Laminas\View\Model\ModelInterface;
 use Mezzio\Authentication\UserInterface;
 use Mezzio\Authorization\AuthorizationInterface;
 use Mezzio\Template\TemplateRendererInterface;
@@ -27,16 +26,14 @@ class AuthorizationMiddleware implements MiddlewareInterface
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        $user  = $request->getAttribute(UserInterface::class, false);
-        $model = $request->getAttribute(ModelInterface::class);
-
+        $user = $request->getAttribute(UserInterface::class, false);
         // todo: Add logging
 
         if (! $user instanceof UserInterface) {
             return new HtmlResponse(
                 $this->renderer->render(
                     'user-manager::401',
-                    $model
+                    ['title' => 'Not Authenticated']
                 ),
                 401
             );
@@ -51,7 +48,7 @@ class AuthorizationMiddleware implements MiddlewareInterface
         return new HtmlResponse(
             $this->renderer->render(
                 'user-manager::403',
-                $model
+                ['title' => ['Not Authorized']]
             ),
             403
         );
