@@ -10,8 +10,6 @@ use Axleus\Mailer\Middleware\MailerMiddleware;
 use Axleus\Validator\PasswordRequirement;
 use Fig\Http\Message\RequestMethodInterface as Http;
 use Laminas\ServiceManager\Factory\InvokableFactory;
-use Mezzio\Application;
-use Mezzio\Container\ApplicationConfigInjectionDelegator;
 use Mezzio\Authentication\AuthenticationInterface;
 use Mezzio\Authentication\Session\PhpSession;
 use Mezzio\Authentication\UserRepositoryInterface;
@@ -122,11 +120,6 @@ final class ConfigProvider
                 AuthorizationInterface::class        => Authz\Rbac::class,
                 LaminasRbacAssertionInterface::class => Authz\UserAssertion::class,
                 UserRepositoryInterface::class       => User\UserRepository::class,
-            ],
-            'delegators' => [
-                Application::class => [
-                    ApplicationConfigInjectionDelegator::class,
-                ],
             ],
             'factories'  => [
                 AuthorizationMiddleware::class           => Middleware\AuthorizationMiddlewareFactory::class,
