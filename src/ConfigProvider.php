@@ -42,7 +42,7 @@ final class ConfigProvider
             'filters'                   => $this->getFilters(),
             'form_elements'             => $this->getFormElementConfig(),
             'input_filters'             => $this->getInputFilterConfig(),
-            'message_listeners'         => $this->getMessageListenerConfig(),
+            'listeners'                 => $this->getMessageListenerConfig(),
             'mezzio-authorization-rbac' => $this->getAuthorizationConfig(),
             'routes'                    => $this->getRouteConfig(),
             'templates'                 => $this->getTemplates(),
