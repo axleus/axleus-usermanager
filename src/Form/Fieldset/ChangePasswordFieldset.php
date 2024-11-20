@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Axleus\UserManager\Form\Fieldset;
 
-use Axleus\Webinertia\Validator\DbStoredPassword;
+use Axleus\Validator\DbStoredPassword;
 use Laminas\Db\Adapter\AdapterAwareTrait;
 use Laminas\Filter\StringTrim;
 use Laminas\Filter\StripTags;

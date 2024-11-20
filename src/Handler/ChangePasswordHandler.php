@@ -47,6 +47,9 @@ class ChangePasswordHandler implements RequestHandlerInterface
         $isValid       = false;
         $eventManager  = $request->getAttribute(EventManagerInterface::class);
         $systemMessage = new SystemMessage(SystemMessage::EVENT_SYSTEM_MESSAGE);
+        /** @var ChangePasswordFieldset */
+        $fieldset = $this->form->get('acct-data');
+
         if ($hasToken) {
             $isValid = $this->helper->verifyToken(
                 $request,
@@ -54,14 +57,12 @@ class ChangePasswordHandler implements RequestHandlerInterface
                 $this->config['app_settings'][ConfigProvider::TOKEN_KEY][VerificationHelper::PASSWORD_RESET_TOKEN]
             );
         }
-        if ($hasToken && $isValid) {
 
-            /** @var ChangePasswordFieldset */
-            $fieldset = $this->form->get('acct-data');
+        if ($hasToken && $isValid) {
             $fieldset->remove('current_password');
             $this->form->setData(['acct-data' => ['id' => $params['id'], 'isTokenReset' => 1]]);
-        } elseif($hasToken && ! $isValid) {
 
+        } elseif($hasToken && ! $isValid) {
             $systemMessage->setSystemMessage(
                 'Your reset link has expired, please use the form to request a new reset link.'
             );
@@ -69,11 +70,13 @@ class ChangePasswordHandler implements RequestHandlerInterface
             return new RedirectResponse(
                 $this->urlHelper->generate('Reset Password')
             );
-        } elseif(! $hasToken) {
 
+        } elseif(! $hasToken) {
             /** @var UserInterface&UserEntity */
             $userInterface = $request->getAttribute(UserInterface::class);
-            $this->form->setData(['acct-data' => ['id' => $userInterface->getDetail('id'), 'isTokenReset' => 0]]);
+            $userId = $userInterface->getDetail('id');
+            $fieldset->setOption('userId', $userId);
+            $this->form->setData(['acct-data' => ['id' => $userId, 'isTokenReset' => 0]]);
         }
 
         return new HtmlResponse($this->renderer->render(
@@ -87,8 +90,10 @@ class ChangePasswordHandler implements RequestHandlerInterface
         $body = $request->getParsedBody();
         /** @var ChangePasswordFieldset */
         $fieldset = $this->form->get('acct-data');
+
         if ((bool) $body['acct-data']['isTokenReset']) {
             $fieldset->remove('current_password');
+
         } else {
             $userInterface = $request->getAttribute(UserInterface::class);
             $userId        = $userInterface->getDetail('id');
@@ -101,12 +106,14 @@ class ChangePasswordHandler implements RequestHandlerInterface
             /** @var UserEntity */
             $userEntity = $this->form->getData();
             $userEntity->offsetUnset('conf_password');
+
             if ($userEntity->offsetExists('isTokenReset')) {
                 $userEntity->offsetUnset('isTokenReset');
             }
             if ($userEntity->offsetExists('current_password')) {
                 $userEntity->offsetUnset('current_password');
             }
+
             $userEntity->hashPassword();
             $userEntity = $this->userRepository->save($userEntity, 'id');
         }
