@@ -65,7 +65,7 @@ class RegistrationHandler implements RequestHandlerInterface
                 throw $th;
             }
             return new RedirectResponse(
-                $this->urlHelper->generate('Home')
+                $this->urlHelper->generate('home')
             );
         }
         return new HtmlResponse($this->renderer->render(

@@ -7,7 +7,6 @@ namespace Axleus\UserManager\Message\Listener;
 use Axleus\Mailer\Adapter\AdapterInterface;
 use Axleus\Mailer\ConfigProvider as MailConfigProvider;
 use Axleus\Mailer\MailerInterface;
-use Axleus\Message\SystemMessage;
 use Axleus\UserManager\ConfigProvider;
 use Axleus\UserManager\Message;
 use Axleus\UserManager\Helper\VerificationHelper;
@@ -74,13 +73,13 @@ final class MessageListener extends AbstractListenerAggregate
         $adapter?->subject(
             sprintf(
                 $mailConfig[ConfigProvider::MAIL_MESSAGE_TEMPLATES][ConfigProvider::MAIL_VERIFY_SUBJECT],
-                $this->config['app_settings']['app_name']
+                $this->config[ConfigProvider::class][ConfigProvider::MODULE_NAME]
             )
         );
         $adapter?->body(
             sprintf(
                 $mailConfig[ConfigProvider::MAIL_MESSAGE_TEMPLATES][ConfigProvider::MAIL_VERIFY_MESSAGE_BODY],
-                $this->config['app_settings'][ConfigProvider::TOKEN_KEY][VerificationHelper::VERIFICATION_TOKEN],
+                $this->config[ConfigProvider::class][ConfigProvider::TOKEN_KEY][VerificationHelper::VERIFICATION_TOKEN],
                 $e->getParam('host'),
                 $this->urlHelper->generate(
                     routeName: 'Verify Account',
@@ -117,13 +116,13 @@ final class MessageListener extends AbstractListenerAggregate
         $adapter?->subject(
             sprintf(
                 $mailConfig[ConfigProvider::MAIL_MESSAGE_TEMPLATES][ConfigProvider::MAIL_RESET_PASSWORD_SUBJECT],
-                $this->config['app_settings']['app_name']
+                $this->config[ConfigProvider::class][ConfigProvider::MODULE_NAME]
             )
         );
         $adapter?->body(
             sprintf(
                 $mailConfig[ConfigProvider::MAIL_MESSAGE_TEMPLATES][ConfigProvider::MAIL_RESET_PASSWORD_MESSAGE_BODY],
-                $this->config['app_settings'][ConfigProvider::TOKEN_KEY][VerificationHelper::PASSWORD_RESET_TOKEN],
+                $this->config[ConfigProvider::class][ConfigProvider::TOKEN_KEY][VerificationHelper::PASSWORD_RESET_TOKEN],
                 $e->getParam('host'), // host
                 $this->urlHelper->generate(
                     routeName: 'Change Password',
