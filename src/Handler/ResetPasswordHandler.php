@@ -86,7 +86,7 @@ class ResetPasswordHandler implements RequestHandlerInterface
                 throw $th;
             }
             return new RedirectResponse(
-                $this->url->generate('Home')
+                $this->url->generate('home')
             );
         }
 

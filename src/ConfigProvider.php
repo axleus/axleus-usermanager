@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Axleus\UserManager;
 
+use Axleus\Core\ConfigProviderInterface;
+use Axleus\Core\Middleware\AuthorizedHandlerPipelineDelegator;
 use Axleus\Mailer\ConfigProvider as MailConfigProvider;
 use Axleus\Mailer\Adapter\AdapterInterface;
 use Axleus\Mailer\Middleware\MailerMiddleware;
@@ -18,47 +20,47 @@ use Mezzio\Authorization\AuthorizationMiddleware;
 use Mezzio\Authorization\Rbac\LaminasRbacAssertionInterface;
 use Mezzio\Helper\BodyParams\BodyParamsMiddleware;
 
-final class ConfigProvider
+final class ConfigProvider implements ConfigProviderInterface
 {
+    public const MODULE_NAME                      = 'module_name';
+    public const DB_TABLE_NAME                    = 'db_table_name';
+    public const APPEND_HTTP_METHOD_TO_PERMS      = 'append_http_method_to_permissions';
+    public const APPEND_ONLY_MAPPED               = 'append_only_mapped';
     public const MAIL_MESSAGE_TEMPLATES           = 'message_templates';
     public const MAIL_VERIFY_MESSAGE_BODY         = 'verify_message_body';
     public const MAIL_VERIFY_SUBJECT              = 'verify_message_subject';
     public const MAIL_RESET_PASSWORD_MESSAGE_BODY = 'reset_password_message_body';
     public const MAIL_RESET_PASSWORD_SUBJECT      = 'reset_password_message_subject';
     public const TOKEN_KEY                        = 'token_lifetime';
-    public const USERMANAGER_TABLE_NAME           = 'user-manager_table_name';
-    public const APPEND_HTTP_METHOD_TO_PERMS      = 'append_http_method_to_permissions';
-    public const APPEND_ONLY_MAPPED               = 'append_only_mapped';
     public const RBAC_MAPPED_ROUTES               = 'rbac_mapped_routes';
 
     public function __invoke(): array
     {
         return [
-            'app_settings'              => $this->getAppSettings(),
+            static::class               => $this->getAxleusConfig(),
             'authentication'            => $this->getAuthenticationConfig(),
             'dependencies'              => $this->getDependencies(),
             'filters'                   => $this->getFilters(),
             'form_elements'             => $this->getFormElementConfig(),
             'input_filters'             => $this->getInputFilterConfig(),
-            'listeners'                 => $this->getMessageListenerConfig(),
+            'listeners'                 => $this->getListenerConfig(),
             'mezzio-authorization-rbac' => $this->getAuthorizationConfig(),
             'routes'                    => $this->getRouteConfig(),
             'templates'                 => $this->getTemplates(),
             'view_helpers'              => $this->getViewHelpers(),
-            static::class               => [
-                static::USERMANAGER_TABLE_NAME      => 'users',
-                static::APPEND_HTTP_METHOD_TO_PERMS => true, // bool true|false
-                static::APPEND_ONLY_MAPPED          => true, // bool true|false
-                static::RBAC_MAPPED_ROUTES          => $this->getRbacMappedRoutes(), // array of routes to map http methods to
-            ],
             MailConfigProvider::class => $this->getMailConfig(),
         ];
     }
 
-    public function getAppSettings(): array
+    public function getAxleusConfig(): array
     {
         return [
-            'token_lifetime' => [
+            static::MODULE_NAME                 => 'Axleus UserManager',
+            static::DB_TABLE_NAME               => 'user',
+            static::APPEND_HTTP_METHOD_TO_PERMS => true, // bool true|false
+            static::APPEND_ONLY_MAPPED          => true, // bool true|false
+            static::RBAC_MAPPED_ROUTES          => $this->getRbacMappedRoutes(), // array of routes to map http methods to
+            'token_lifetime'      => [
                 'verificationToken'   => '1 Hour',
                 'passwordResetToken'  => '1 Hour',
             ],
@@ -71,6 +73,7 @@ final class ConfigProvider
                     'special' => 2, // special char count
                 ],
             ],
+            MailConfigProvider::class => $this->getMailConfig(),
         ];
     }
 
@@ -95,7 +98,7 @@ final class ConfigProvider
             ],
             'permissions' => [
                 'Guest' => [
-                    'Home',
+                    'home',
                     'Change Password',
                     'Login',
                     'Register',
@@ -120,6 +123,29 @@ final class ConfigProvider
                 AuthorizationInterface::class        => Authz\Rbac::class,
                 LaminasRbacAssertionInterface::class => Authz\UserAssertion::class,
                 UserRepositoryInterface::class       => User\UserRepository::class,
+            ],
+            'delegators' => [
+                Handler\AccountHandler::class        => [
+                    AuthorizedHandlerPipelineDelegator::class,
+                ],
+                Handler\ChangePasswordHandler::class => [
+                    AuthorizedHandlerPipelineDelegator::class,
+                ],
+                Handler\LoginHandler::class          => [
+                    AuthorizedHandlerPipelineDelegator::class,
+                ],
+                Handler\LogoutHandler::class         => [
+                    AuthorizedHandlerPipelineDelegator::class,
+                ],
+                Handler\RegistrationHandler::class   => [
+                    AuthorizedHandlerPipelineDelegator::class,
+                ],
+                Handler\ResetPasswordHandler::class  => [
+                    AuthorizedHandlerPipelineDelegator::class,
+                ],
+                Handler\VerifyAccountHandler::class  => [
+                    AuthorizedHandlerPipelineDelegator::class,
+                ],
             ],
             'factories'  => [
                 AuthorizationMiddleware::class           => Middleware\AuthorizationMiddlewareFactory::class,
@@ -176,6 +202,16 @@ final class ConfigProvider
         ];
     }
 
+    public function getListenerConfig(): array
+    {
+        return [
+            [
+                'listener' => Message\Listener\MessageListener::class,
+                //'priority' => 0,
+            ]
+        ];
+    }
+
     public function getMailConfig(): array
     {
         return [
@@ -187,16 +223,6 @@ final class ConfigProvider
                     static::MAIL_RESET_PASSWORD_MESSAGE_BODY => 'The reset link in this email is valid for %s. Please <a href="%s%s">Click Here!!</a> to reset your password.'
                 ],
             ],
-        ];
-    }
-
-    public function getMessageListenerConfig(): array
-    {
-        return [
-            [
-                'listener' => Message\Listener\MessageListener::class,
-                //'priority' => 0,
-            ]
         ];
     }
 
@@ -274,7 +300,6 @@ final class ConfigProvider
                 'name'        => 'Account',
                 'middleware'  => [
                     BodyParamsMiddleware::class,
-                    AuthorizationMiddleware::class,
                     Handler\AccountHandler::class,
                 ],
                 'allowed_methods' => [Http::METHOD_GET, Http::METHOD_POST],

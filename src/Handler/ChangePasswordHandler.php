@@ -54,7 +54,7 @@ class ChangePasswordHandler implements RequestHandlerInterface
             $isValid = $this->helper->verifyToken(
                 $request,
                 VerificationHelper::PASSWORD_RESET_TOKEN,
-                $this->config['app_settings'][ConfigProvider::TOKEN_KEY][VerificationHelper::PASSWORD_RESET_TOKEN]
+                $this->config[ConfigProvider::TOKEN_KEY][VerificationHelper::PASSWORD_RESET_TOKEN]
             );
         }
 

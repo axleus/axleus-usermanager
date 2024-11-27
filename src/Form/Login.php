@@ -18,6 +18,8 @@ final class Login extends Form\Form implements AdapterAwareInterface, InputFilte
     use AdapterAwareTrait;
     use HtmxTrait;
 
+    public const OPTION_KEY = 'db_table_name';
+
     protected $attributes = ['class' => 'login-form'];
 
     /** @inheritDoc */
@@ -76,7 +78,7 @@ final class Login extends Form\Form implements AdapterAwareInterface, InputFilte
                     [
                         'name'    => Validator\Db\RecordExists::class,
                         'options' => [
-                            'table'     => 'users',
+                            'table'     => $this->getOption(self::OPTION_KEY),
                             'field'     => 'email',
                             'dbAdapter' => $this->adapter,
                             'messages'  => [

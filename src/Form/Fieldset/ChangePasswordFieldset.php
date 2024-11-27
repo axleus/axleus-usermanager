@@ -39,8 +39,8 @@ final class ChangePasswordFieldset extends PasswordFieldset
         ]);
         $this->add(
             [
-                'name' => 'current_password',
-                'type' => Password::class,
+                'name'       => 'current_password',
+                'type'       => Password::class,
                 'attributes' => [
                     'placeholder' => 'Current Password',
                 ],
@@ -53,21 +53,21 @@ final class ChangePasswordFieldset extends PasswordFieldset
     {
         $options = $this->getOptions();
         $spec    = parent::getInputFilterSpecification();
-        $spec[] = [
-            'name'       => 'current_password',
-            'required'   => false,
+        $spec[]  = [
+            'name'        => 'current_password',
+            'required'    => false,
             'allow_empty' => true,
-            'filters'    => [
+            'filters'     => [
                 ['name' => StripTags::class],
                 ['name' => StringTrim::class],
             ],
-            'validators' => [
+            'validators'  => [
                 [
                     'name'    => DbStoredPassword::class,
                     'options' => [
-                        'table'    => 'users',
-                        'pkColumn' => 'id',
-                        'pkValue'  => $options['userId'],
+                        'table'           => $options['db_table_name'],
+                        'pkColumn'        => 'id',
+                        'pkValue'         => $options['userId'],
                         'password_column' => 'password',
                     ],
                 ],

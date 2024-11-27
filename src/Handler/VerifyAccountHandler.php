@@ -44,7 +44,7 @@ class VerifyAccountHandler implements RequestHandlerInterface
                 ! $this->verifyHelper->verifyToken(
                     $request,
                     VerificationHelper::VERIFICATION_TOKEN,
-                    $this->config['app_settings'][ConfigProvider::TOKEN_KEY][VerificationHelper::VERIFICATION_TOKEN]
+                    $this->config[ConfigProvider::class][ConfigProvider::TOKEN_KEY][VerificationHelper::VERIFICATION_TOKEN]
                 )
             ) {
                 /** @var UserEntity */
@@ -73,7 +73,7 @@ class VerifyAccountHandler implements RequestHandlerInterface
         $systemMessage->setSystemMessage('Verification successful! You can now login.');
         $eventManager->triggerEvent($systemMessage);
         return new RedirectResponse(
-            $this->urlHelper->generate('Home')
+            $this->urlHelper->generate('home')
         );
     }
 
@@ -101,7 +101,7 @@ class VerifyAccountHandler implements RequestHandlerInterface
             throw $th;
         }
         return new RedirectResponse(
-            $this->urlHelper->generate('Home')
+            $this->urlHelper->generate('home')
         );
     }
 }

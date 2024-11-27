@@ -4,13 +4,12 @@ declare(strict_types=1);
 
 namespace Axleus\UserManager\Helper;
 
+use Axleus\Core\ConfigProvider as CoreProvider;
 use Axleus\UserManager\ConfigProvider;
 use Axleus\UserManager\User\UserRepository;
 use Axleus\UserManager\User\UserEntity;
 use Axleus\UserManager\Validator\UuidV7TokenValidator as TokenValidator;
-use DateInterval;
 use DateTimeImmutable;
-use Laminas\Db\Sql\Select;
 use Mezzio\Authentication\UserRepositoryInterface;
 use Mezzio\Router\RouteResult;
 use Psr\Http\Message\ServerRequestInterface;
@@ -51,7 +50,7 @@ final class VerificationHelper
                 if ($tokenValidator->isValid($this->target->offsetGet($type))) {
                     $data = $this->target->getArrayCopy();
                     $now                 = new DateTimeImmutable();
-                    $data['dateUpdated'] = $now->format($this->config['app_settings']['datetime_format']);
+                    $data['dateUpdated'] = $now->format($this->config[CoreProvider::class][CoreProvider::DATETIME_FORMAT]);
                     if ($type === self::VERIFICATION_TOKEN) {
                         $data['dateVerified'] = $data['dateUpdated'];
                         $data['verified']     = 1;
