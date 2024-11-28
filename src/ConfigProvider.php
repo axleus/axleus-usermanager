@@ -11,13 +11,11 @@ use Axleus\Mailer\Adapter\AdapterInterface;
 use Axleus\Mailer\Middleware\MailerMiddleware;
 use Axleus\Validator\PasswordRequirement;
 use Fig\Http\Message\RequestMethodInterface as Http;
+use Laminas\Permissions\Acl\Assertion\OwnershipAssertion;
 use Laminas\ServiceManager\Factory\InvokableFactory;
 use Mezzio\Authentication\AuthenticationInterface;
 use Mezzio\Authentication\Session\PhpSession;
 use Mezzio\Authentication\UserRepositoryInterface;
-use Mezzio\Authorization\AuthorizationInterface;
-use Mezzio\Authorization\AuthorizationMiddleware;
-use Mezzio\Authorization\Rbac\LaminasRbacAssertionInterface;
 use Mezzio\Helper\BodyParams\BodyParamsMiddleware;
 
 final class ConfigProvider implements ConfigProviderInterface
@@ -37,18 +35,48 @@ final class ConfigProvider implements ConfigProviderInterface
     public function __invoke(): array
     {
         return [
-            static::class               => $this->getAxleusConfig(),
-            'authentication'            => $this->getAuthenticationConfig(),
-            'dependencies'              => $this->getDependencies(),
-            'filters'                   => $this->getFilters(),
-            'form_elements'             => $this->getFormElementConfig(),
-            'input_filters'             => $this->getInputFilterConfig(),
-            'listeners'                 => $this->getListenerConfig(),
-            'mezzio-authorization-rbac' => $this->getAuthorizationConfig(),
-            'routes'                    => $this->getRouteConfig(),
-            'templates'                 => $this->getTemplates(),
-            'view_helpers'              => $this->getViewHelpers(),
-            MailConfigProvider::class => $this->getMailConfig(),
+            static::class              => $this->getAxleusConfig(),
+            'authentication'           => $this->getAuthenticationConfig(),
+            'dependencies'             => $this->getDependencies(),
+            'form_elements'            => $this->getFormElementConfig(),
+            'input_filters'            => $this->getInputFilterConfig(),
+            'listeners'                => $this->getListenerConfig(),
+            'mezzio-authorization-acl' => $this->getAuthorizationConfig(),
+            'routes'                   => $this->getRouteConfig(),
+            'templates'                => $this->getTemplates(),
+            'view_helpers'             => $this->getViewHelpers(),
+            MailConfigProvider::class  => $this->getMailConfig(),
+        ];
+    }
+
+    public function getAuthorizationConfig(): array
+    {
+        return [
+            'resources' => [
+                'account.read',
+                'change.password',
+                'login',
+                'logout',
+                'register',
+                'reset.password',
+                'verify.account',
+            ],
+            'allow' => [
+                'Guest' => [
+                    'login',
+                ],
+                'User'  => [
+                    'logout',
+                    ['account.read', 'assertion' => new OwnershipAssertion()],
+                ],
+                'Administrator' => [
+                ],
+            ],
+            'deny' => [
+                'User' => [
+                    'login'
+                ],
+            ],
         ];
     }
 
@@ -59,7 +87,7 @@ final class ConfigProvider implements ConfigProviderInterface
             static::DB_TABLE_NAME               => 'user',
             static::APPEND_HTTP_METHOD_TO_PERMS => true, // bool true|false
             static::APPEND_ONLY_MAPPED          => true, // bool true|false
-            static::RBAC_MAPPED_ROUTES          => $this->getRbacMappedRoutes(), // array of routes to map http methods to
+            //static::RBAC_MAPPED_ROUTES          => $this->getRbacMappedRoutes(), // array of routes to map http methods to
             'token_lifetime'      => [
                 'verificationToken'   => '1 Hour',
                 'passwordResetToken'  => '1 Hour',
@@ -86,43 +114,12 @@ final class ConfigProvider implements ConfigProviderInterface
         ];
     }
 
-    public function getAuthorizationConfig(): array
-    {
-        return [
-            'roles'       => [
-                'Administrator' => [],
-                //'Editor'        => ['Administrator'],
-                //'Contributor'   => ['Editor'],
-                'User'          => ['Administrator'],
-                'Guest'         => ['User'],
-            ],
-            'permissions' => [
-                'Guest' => [
-                    'home',
-                    'Change Password',
-                    'Login',
-                    'Register',
-                    'Reset Password',
-                    'Verify Account',
-                ],
-                'User'  => [
-                    'Logout',
-                    'Account.read',
-                ],
-                'Administrator' => [
-                ],
-            ],
-        ];
-    }
-
     public function getDependencies(): array
     {
         return [
             'aliases'    => [
-                AuthenticationInterface::class       => PhpSession::class,
-                AuthorizationInterface::class        => Authz\Rbac::class,
-                LaminasRbacAssertionInterface::class => Authz\UserAssertion::class,
-                UserRepositoryInterface::class       => User\UserRepository::class,
+                AuthenticationInterface::class => PhpSession::class,
+                UserRepositoryInterface::class => User\UserRepository::class,
             ],
             'delegators' => [
                 Handler\AccountHandler::class        => [
@@ -148,9 +145,6 @@ final class ConfigProvider implements ConfigProviderInterface
                 ],
             ],
             'factories'  => [
-                AuthorizationMiddleware::class           => Middleware\AuthorizationMiddlewareFactory::class,
-                Authz\Rbac::class                        => Authz\RbacFactory::class,
-                Authz\UserAssertion::class               => InvokableFactory::class,
                 Handler\AccountHandler::class            => Handler\AccountHandlerFactory::class,
                 Handler\ChangePasswordHandler::class     => Handler\ChangePasswordHandlerFactory::class,
                 Handler\LoginHandler::class              => Handler\LoginHandlerFactory::class,
@@ -162,15 +156,6 @@ final class ConfigProvider implements ConfigProviderInterface
                 Message\Listener\MessageListener::class  => Message\Listener\MessageListenerFactory::class,
                 Middleware\IdentityMiddleware::class     => Middleware\IdentityMiddlewareFactory::class,
                 User\UserRepository::class               => User\UserRepositoryFactory::class,
-            ],
-        ];
-    }
-
-    public function getFilters(): array
-    {
-        return [
-            'factories' => [
-                Filter\HttpMethodToRbacPermissionFilter::class => InvokableFactory::class,
             ],
         ];
     }
@@ -226,29 +211,22 @@ final class ConfigProvider implements ConfigProviderInterface
         ];
     }
 
-    public function getRbacMappedRoutes(): array
-    {
-        return [
-            'Account',
-        ];
-    }
-
     public function getRouteConfig(): array
     {
         return [
             [
-                'path'       => '/user-manager/login',
-                'name'       => 'Login', // todo: update name to use um prefix
-                'middleware' => [
+                'path'            => '/user-manager/login',
+                'name'            => 'login',
+                'allowed_methods' => [Http::METHOD_GET, Http::METHOD_POST],
+                'middleware'      => [
                     //AuthorizationMiddleware::class,
                     BodyParamsMiddleware::class,
                     Handler\LoginHandler::class,
                 ],
-                'allowed_methods' => [Http::METHOD_GET, Http::METHOD_POST]
             ],
             [
                 'path'       => '/user-manager/logout',
-                'name'       => 'Logout',
+                'name'       => 'logout',
                 'middleware' => [
                     //AuthorizationMiddleware::class,
                     BodyParamsMiddleware::class,
@@ -256,53 +234,62 @@ final class ConfigProvider implements ConfigProviderInterface
                 ],
             ],
             [
-                'path'        => '/user-manager/register',
-                'name'        => 'Register',
-                'middleware'  => [
+                'path'            => '/user-manager/register',
+                'name'            => 'register',
+                'allowed_methods' => [Http::METHOD_GET, Http::METHOD_POST],
+                'middleware'      => [
                     BodyParamsMiddleware::class,
                     MailerMiddleware::class,
                     Handler\RegistrationHandler::class,
                 ],
-                'allowed_methods' => [Http::METHOD_GET, Http::METHOD_POST],
             ],
             [
-                'path'        => '/user-manager/reset-password',
-                'name'        => 'Reset Password',
-                'middleware'  => [
+                'path'            => '/user-manager/reset-password',
+                'name'            => 'reset.password',
+                'allowed_methods' => [Http::METHOD_GET, Http::METHOD_POST],
+                'middleware'      => [
                     BodyParamsMiddleware::class,
                     MailerMiddleware::class,
                     Handler\ResetPasswordHandler::class,
                 ],
-                'allowed_methods' => [Http::METHOD_GET, Http::METHOD_POST],
             ],
             [
-                'path'        => '/user-manager/change-password[/{id:\d+}[/{token:[a-zA-Z0-9-]+}]]',
-                'name'        => 'Change Password',
-                'middleware'  => [
+                'path'            => '/user-manager/change-password[/{id:\d+}[/{token:[a-zA-Z0-9-]+}]]',
+                'name'            => 'change.password',
+                'allowed_methods' => [Http::METHOD_GET, Http::METHOD_POST],
+                'middleware'      => [
                     BodyParamsMiddleware::class,
                     MailerMiddleware::class,
                     Handler\ChangePasswordHandler::class,
                 ],
-                'allowed_methods' => [Http::METHOD_GET, Http::METHOD_POST],
             ],
             [
-                'path'        => '/user-manager/verify[/{id:\d+}[/{token:[a-zA-Z0-9-]+}]]',
-                'name'        => 'Verify Account',
-                'middleware'  => [
+                'path'            => '/user-manager/verify[/{id:\d+}[/{token:[a-zA-Z0-9-]+}]]',
+                'name'            => 'verify.account',
+                'allowed_methods' => [Http::METHOD_GET, Http::METHOD_POST],
+                'middleware'      => [
                     BodyParamsMiddleware::class,
                     MailerMiddleware::class,
                     Handler\VerifyAccountHandler::class,
                 ],
-                'allowed_methods' => [Http::METHOD_GET, Http::METHOD_POST],
             ],
             [
-                'path'        => '/user-manager/account',
-                'name'        => 'Account',
-                'middleware'  => [
+                'path'            => '/user-manager/account[/{userId:\d+}]',
+                'name'            => 'account.read',
+                'allowed_methods' => [Http::METHOD_GET],
+                'middleware'      => [
+                    Handler\AccountHandler::class,
+                ],
+            ],
+            [
+                'path'            => '/user-manager/account[/{userId:\d+}]',
+                'name'            => 'account.update',
+                'allowed_methods' => [Http::METHOD_POST, Http::METHOD_PUT, Http::METHOD_PATCH],
+                'middleware'      => [
                     BodyParamsMiddleware::class,
                     Handler\AccountHandler::class,
                 ],
-                'allowed_methods' => [Http::METHOD_GET, Http::METHOD_POST],
+
             ],
         ];
     }
