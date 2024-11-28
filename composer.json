@@ -19,21 +19,17 @@
         }
     ],
     "require": {
-        "php": "~8.1.0 || ~8.2.0 || ~8.3.0",
+        "php": "~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0",
+        "axleus/axleus-admin": "dev-master",
+        "axleus/axleus-authorization": "dev-master",
         "axleus/axleus-db": "dev-master",
+        "axleus/axleus-core": "dev-master",
         "axleus/axleus-filter": "dev-master",
         "axleus/axleus-mailer": "dev-master",
         "axleus/axleus-message": "dev-master",
         "axleus/axleus-validator": "dev-master",
-        "laminas/laminas-config": "^3.9",
         "laminas/laminas-component-installer": "^3.2",
-        "laminas/laminas-stdlib": "^3.6",
-        "mezzio/mezzio": "^3.7",
-        "mezzio/mezzio-authentication-session": "^1.9",
-        "mezzio/mezzio-authorization-rbac": "^1.7",
-        "mezzio/mezzio-laminasviewrenderer": "^2.15",
-        "phpmailer/phpmailer": "^6.9",
-        "ramsey/uuid": "^4.7"
+        "laminas/laminas-stdlib": "^3.6"
     },
     "require-dev": {
         "laminas/laminas-coding-standard": "^2.5",
