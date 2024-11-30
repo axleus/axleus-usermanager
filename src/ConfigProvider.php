@@ -42,6 +42,7 @@ final class ConfigProvider implements ConfigProviderInterface
             'input_filters'            => $this->getInputFilterConfig(),
             'listeners'                => $this->getListenerConfig(),
             'mezzio-authorization-acl' => $this->getAuthorizationConfig(),
+            'navigation'               => $this->getNavigation(),
             'routes'                   => $this->getRouteConfig(),
             'templates'                => $this->getTemplates(),
             'view_helpers'             => $this->getViewHelpers(),
@@ -61,7 +62,7 @@ final class ConfigProvider implements ConfigProviderInterface
                 'reset.password',
                 'verify.account',
             ],
-            'allow' => [
+            'allow'     => [
                 'Guest' => [
                     'login',
                 ],
@@ -88,11 +89,11 @@ final class ConfigProvider implements ConfigProviderInterface
             static::APPEND_HTTP_METHOD_TO_PERMS => true, // bool true|false
             static::APPEND_ONLY_MAPPED          => true, // bool true|false
             //static::RBAC_MAPPED_ROUTES          => $this->getRbacMappedRoutes(), // array of routes to map http methods to
-            'token_lifetime'      => [
+            'token_lifetime'                    => [
                 'verificationToken'   => '1 Hour',
                 'passwordResetToken'  => '1 Hour',
             ],
-            PasswordRequirement::class => [
+            PasswordRequirement::class          => [
                 'options' => [
                     'length'  => 8, // overall length of password
                     'upper'   => 1, // uppercase count
@@ -207,6 +208,26 @@ final class ConfigProvider implements ConfigProviderInterface
                     static::MAIL_RESET_PASSWORD_SUBJECT => '%s Password Reset.',
                     static::MAIL_RESET_PASSWORD_MESSAGE_BODY => 'The reset link in this email is valid for %s. Please <a href="%s%s">Click Here!!</a> to reset your password.'
                 ],
+            ],
+        ];
+    }
+
+    public function getNavigation(): array
+    {
+        return [
+            'default' => [
+                [
+                    'label' => 'Login',
+                    'route' => 'login',
+                ],
+                [
+                    'label' => 'Logout',
+                    'route' => 'logout',
+                ],
+                [
+                    'label' => 'Account',
+                    'route' => 'account.read',
+                ]
             ],
         ];
     }
