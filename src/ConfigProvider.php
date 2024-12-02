@@ -20,6 +20,7 @@ use Mezzio\Helper\BodyParams\BodyParamsMiddleware;
 
 final class ConfigProvider implements ConfigProviderInterface
 {
+    public const string CONFIG_MANAGER_TARGET_FILE = 'usermanager.global.php';
     public const MODULE_NAME                      = 'module_name';
     public const DB_TABLE_NAME                    = 'db_table_name';
     public const APPEND_HTTP_METHOD_TO_PERMS      = 'append_http_method_to_permissions';
@@ -146,6 +147,7 @@ final class ConfigProvider implements ConfigProviderInterface
                 ],
             ],
             'factories'  => [
+                Admin\AdminConnectListener::class        => Admin\AdminConnectListenerFactory::class,
                 Handler\AccountHandler::class            => Handler\AccountHandlerFactory::class,
                 Handler\ChangePasswordHandler::class     => Handler\ChangePasswordHandlerFactory::class,
                 Handler\LoginHandler::class              => Handler\LoginHandlerFactory::class,
@@ -192,6 +194,9 @@ final class ConfigProvider implements ConfigProviderInterface
     {
         return [
             [
+                'listener' => Admin\AdminConnectListener::class,
+            ],
+            [
                 'listener' => Message\Listener\MessageListener::class,
                 //'priority' => 0,
             ]
@@ -235,6 +240,9 @@ final class ConfigProvider implements ConfigProviderInterface
     public function getRouteConfig(): array
     {
         return [
+            // [
+            //     'path'            => '/axleus/admin/user-manager/'
+            // ],
             [
                 'path'            => '/user-manager/login',
                 'name'            => 'login',
