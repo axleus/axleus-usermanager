@@ -222,17 +222,23 @@ final class ConfigProvider implements ConfigProviderInterface
         return [
             'default' => [
                 [
-                    'label' => 'Login',
-                    'route' => 'login',
+                    'label'     => 'Login',
+                    'route'     => 'login',
+                    'resource'  => 'login',
+                    'privilege' => 'login',
                 ],
                 [
-                    'label' => 'Logout',
-                    'route' => 'logout',
+                    'label'     => 'Logout',
+                    'route'     => 'logout',
+                    'resource'  => 'logout',
+                    'privilege' => 'logout',
                 ],
                 [
-                    'label' => 'Account',
-                    'route' => 'account.read',
-                ]
+                    'label'     => 'Account',
+                    'route'     => 'account.read',
+                    'resource'  => 'account.read',
+                    'privilege' => 'account.read',
+                ],
             ],
         ];
     }
