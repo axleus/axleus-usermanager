@@ -193,13 +193,8 @@ final class ConfigProvider implements ConfigProviderInterface
     public function getListenerConfig(): array
     {
         return [
-            [
-                'listener' => Admin\AdminConnectListener::class,
-            ],
-            [
-                'listener' => Message\Listener\MessageListener::class,
-                //'priority' => 0,
-            ]
+            Admin\AdminConnectListener::class,
+            Message\Listener\MessageListener::class,
         ];
     }
 
