@@ -227,6 +227,7 @@ final class ConfigProvider implements ConfigProviderInterface
                     'route'     => 'logout',
                     'resource'  => 'logout',
                     'privilege' => 'logout',
+                    'order'     => 100,
                 ],
                 [
                     'label'     => 'Account',
