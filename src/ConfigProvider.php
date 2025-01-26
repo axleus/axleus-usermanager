@@ -66,9 +66,11 @@ final class ConfigProvider implements ConfigProviderInterface
             'allow'     => [
                 'Guest' => [
                     'login',
+                    'register',
                 ],
                 'User'  => [
                     'logout',
+                    ['change.password', 'assertion' => new OwnershipAssertion()],
                     ['account.read', 'assertion' => new OwnershipAssertion()],
                 ],
                 'Administrator' => [
@@ -76,7 +78,8 @@ final class ConfigProvider implements ConfigProviderInterface
             ],
             'deny' => [
                 'User' => [
-                    'login'
+                    'login',
+                    'register',
                 ],
             ],
         ];
@@ -147,18 +150,18 @@ final class ConfigProvider implements ConfigProviderInterface
                 ],
             ],
             'factories'  => [
-                Admin\AdminConnectListener::class        => Admin\AdminConnectListenerFactory::class,
-                Handler\AccountHandler::class            => Handler\AccountHandlerFactory::class,
-                Handler\ChangePasswordHandler::class     => Handler\ChangePasswordHandlerFactory::class,
-                Handler\LoginHandler::class              => Handler\LoginHandlerFactory::class,
-                Handler\LogoutHandler::class             => Handler\LogoutHandlerFactory::class,
-                Handler\RegistrationHandler::class       => Handler\RegistrationHandlerFactory::class,
-                Handler\ResetPasswordHandler::class      => Handler\ResetPasswordHandlerFactory::class,
-                Handler\VerifyAccountHandler::class      => Handler\VerifyAccountHandlerFactory::class,
-                Helper\VerificationHelper::class         => Helper\VerificationHelperFactory::class,
-                Message\Listener\MessageListener::class  => Message\Listener\MessageListenerFactory::class,
-                Middleware\IdentityMiddleware::class     => Middleware\IdentityMiddlewareFactory::class,
-                User\UserRepository::class               => User\UserRepositoryFactory::class,
+                Admin\AdminConnectListener::class       => Admin\AdminConnectListenerFactory::class,
+                Handler\AccountHandler::class           => Handler\AccountHandlerFactory::class,
+                Handler\ChangePasswordHandler::class    => Handler\ChangePasswordHandlerFactory::class,
+                Handler\LoginHandler::class             => Handler\LoginHandlerFactory::class,
+                Handler\LogoutHandler::class            => Handler\LogoutHandlerFactory::class,
+                Handler\RegistrationHandler::class      => Handler\RegistrationHandlerFactory::class,
+                Handler\ResetPasswordHandler::class     => Handler\ResetPasswordHandlerFactory::class,
+                Handler\VerifyAccountHandler::class     => Handler\VerifyAccountHandlerFactory::class,
+                Helper\VerificationHelper::class        => Helper\VerificationHelperFactory::class,
+                Message\Listener\MessageListener::class => Message\Listener\MessageListenerFactory::class,
+                Middleware\IdentityMiddleware::class    => Middleware\IdentityMiddlewareFactory::class,
+                User\UserRepository::class              => User\UserRepositoryFactory::class,
             ],
         ];
     }
@@ -221,6 +224,14 @@ final class ConfigProvider implements ConfigProviderInterface
                     'route'     => 'login',
                     'resource'  => 'login',
                     'privilege' => 'login',
+                    'class'     => 'nav-link',
+                ],
+                [
+                    'label'     => 'SignUp',
+                    'route'     => 'register',
+                    'resource'  => 'register',
+                    'privilege' => 'register',
+                    'class'     => 'nav-link',
                 ],
                 [
                     'label'     => 'Logout',
@@ -228,12 +239,14 @@ final class ConfigProvider implements ConfigProviderInterface
                     'resource'  => 'logout',
                     'privilege' => 'logout',
                     'order'     => 100,
+                    'class'     => 'nav-link',
                 ],
                 [
                     'label'     => 'Account',
                     'route'     => 'account.read',
                     'resource'  => 'account.read',
                     'privilege' => 'account.read',
+                    'class'     => 'nav-link button',
                 ],
             ],
         ];
