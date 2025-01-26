@@ -16,7 +16,7 @@ class Register extends Form\Form
     public function init(): void
     {
         $this->setAttributes([
-            'action' => $this->urlHelper->generate('Register'),
+            'action' => $this->urlHelper->generate('register'),
             'method' => Http::METHOD_POST,
         ]);
         $this->add([

@@ -19,6 +19,7 @@ final class MessageListener extends AbstractListenerAggregate
     private const NOTIFY_MESSAGE = <<<'EOM'
     Verification email sent!
     EOM;
+
     private EventManagerInterface $events;
 
     public function __construct(
