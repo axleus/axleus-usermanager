@@ -217,12 +217,14 @@ final class ConfigProvider implements ConfigProviderInterface
         return [
             'default' => [
                 [
+                    'class'     => 'nav-link',
                     'label'     => 'Login',
                     'route'     => 'login',
                     'resource'  => 'login',
                     'privilege' => 'login',
                 ],
                 [
+                    'class'     => 'nav-link',
                     'label'     => 'Logout',
                     'route'     => 'logout',
                     'resource'  => 'logout',
@@ -230,6 +232,7 @@ final class ConfigProvider implements ConfigProviderInterface
                     'order'     => 100,
                 ],
                 [
+                    'class'     => 'nav-link',
                     'label'     => 'Account',
                     'route'     => 'account.read',
                     'resource'  => 'account.read',
