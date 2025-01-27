@@ -68,7 +68,7 @@ class ChangePasswordHandler implements RequestHandlerInterface
             );
             $eventManager->triggerEvent($systemMessage);
             return new RedirectResponse(
-                $this->urlHelper->generate('Reset Password')
+                $this->urlHelper->generate('reset.password')
             );
 
         } elseif(! $hasToken) {

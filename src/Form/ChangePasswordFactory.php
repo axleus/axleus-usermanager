@@ -18,6 +18,7 @@ final class ChangePasswordFactory
         $form = new ChangePassword(
             options: [
                 'password_options' => $passwordOptions,
+                'db_table_name'    => $config[ConfigProvider::class][ConfigProvider::DB_TABLE_NAME],
             ]
         );
         $form->setUrlHelper($container->get(UrlHelper::class));

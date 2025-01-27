@@ -69,6 +69,7 @@ final class ConfigProvider implements ConfigProviderInterface
                 ],
                 'User'  => [
                     'logout',
+                    ['change.password', 'assertion' => new OwnershipAssertion()],
                     ['account.read', 'assertion' => new OwnershipAssertion()],
                 ],
                 'Administrator' => [
