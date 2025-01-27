@@ -24,7 +24,7 @@ final class ChangePassword extends Form
         $options = $this->getOptions();
         $this->setAttributes([
             'action' => $this->urlHelper->generate(
-                routeName: 'Change Password',
+                routeName: 'change.password',
                 //options: ['reuse_result_params' => false]
             ),
             'method' => Http::METHOD_POST,
@@ -34,7 +34,8 @@ final class ChangePassword extends Form
             'type' => Fieldset\ChangePasswordFieldset::class,
             'options' => [
                 'use_as_base_fieldset' => true,
-                'password_options'     => $options['password_options']
+                'password_options'     => $options['password_options'],
+                'db_table_name'        => $options['db_table_name'],
             ]
         ]);
         $this->add([
